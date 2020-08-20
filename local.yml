@@ -1,0 +1,61 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  django:
+    build:
+      context: ./kanban_backend
+      dockerfile: ./kanban_backend/compose/local/django/Dockerfile
+    image: kanban_backend_local_django
+    container_name: django
+    depends_on:
+      - postgres
+    volumes:
+      - ./kanban_backend:/app
+    env_file:
+      - ./kanban_backend/.envs/.local/.django
+      - ./kanban_backend/.envs/.local/.postgres
+    ports:
+      - "8000:8000"
+    command: /start
+
+  postgres:
+    build:
+      context: ./kanban_backend
+      dockerfile: ./kanban_backend/compose/production/postgres/Dockerfile
+    image: kanban_backend_production_postgres
+    container_name: postgres
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./kanban_backend/.envs/.local/.postgres
+
+  docs:
+    image: kanban_backend_local_docs
+    container_name: docs
+    build:
+      context: ./kanban_backend
+      dockerfile: ./kanban_backend/compose/local/docs/Dockerfile
+    env_file:
+      - ./kanban_backend/.envs/.local/.django
+    volumes:
+      - ./kanban_backend/docs:/docs
+      - ./kanban_backend/config:/app/config
+      - ./kanban_backend/kanban_backend:/app/kanban_backend
+    ports:
+      - "7000:7000"
+
+  kanban_frontend:
+    container_name: kanban_frontend
+    build:
+      context: ./kanban_frontend
+      dockerfile: Dockerfile
+    volumes:
+      - './kanban_frontend:/app'
+      - '/app/node_modules'
+    ports:
+      - '8080:8080'

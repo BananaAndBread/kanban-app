@@ -8,7 +8,7 @@
           </template>
           <template v-slot:tasks>
             <div class="kanban__tasks kanban__tasks--big">
-              <draggable :list="item.cards" group="tasks" @move='check(item)'
+              <draggable :list="item.cards" group="tasks"
                          @change="updateColumn($event, item)">
                 <Task @click.native="showModal(card.id)" @removeCard='removeCard(item.id, card.id)'
                       :id="card.id" :key="card.id" :text="card.text" v-for="card in item.cards"

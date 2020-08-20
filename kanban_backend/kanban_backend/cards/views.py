@@ -8,7 +8,7 @@ from kanban_backend.cards.permissions import IsOwner
 
 
 def increment_cards_seq_id(row):
-    cards = Card.objects.filter(row=row)
+    cards = Card.objects.filter(row__id=int(row))
     for card in cards:
         card.seq_num = card.seq_num + 1
         card.save()
@@ -38,12 +38,14 @@ class CardViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, **kwargs):
+        backend_row = int(request.data['row'])
         serializer = self.get_serializer(data={
             **request.data,
             'seq_num': 0,
+            'row': backend_row
         })
         serializer.is_valid(raise_exception=True)
-        increment_cards_seq_id(serializer.validated_data['row'])
+        increment_cards_seq_id(backend_row)
         serializer.save()
         return Response(serializer.data)
 

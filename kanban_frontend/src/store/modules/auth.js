@@ -44,7 +44,9 @@ const actions = {
     }
   },
   logout () {
+    localStorage.removeItem('vuex')
     localStorage.token = ''
+    window.location.reload()
   }
 }
 

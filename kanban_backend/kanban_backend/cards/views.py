@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import render
-from rest_framework import viewsets, mixins, status
+from rest_framework import viewsets, mixins, status, permissions
 from kanban_backend.cards.models import Card
 from kanban_backend.cards.serializers import CardSerializer
 from rest_framework.response import Response
+from kanban_backend.cards.permissions import IsOwner
 
 
 def increment_cards_seq_id(row):
@@ -19,8 +20,17 @@ class CardViewSet(mixins.CreateModelMixin,
                   viewsets.GenericViewSet,
                   mixins.ListModelMixin,
                   mixins.UpdateModelMixin):
-    queryset = Card.objects.all()
+    # queryset = Card.objects.all()
     serializer_class = CardSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all the purchases
+        for the currently authenticated user.
+        """
+        user = self.request.user
+        return Card.objects.filter(owner=user)
 
     def destroy(self, *args, **kwargs):
         serializer = self.get_serializer(self.get_object())
@@ -28,18 +38,12 @@ class CardViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, **kwargs):
-        serializer = CardSerializer(data={
+        serializer = self.get_serializer(data={
             **request.data,
-            'seq_num': 0
+            'seq_num': 0,
         })
         serializer.is_valid(raise_exception=True)
         increment_cards_seq_id(serializer.validated_data['row'])
-        # card = Card.objects.create(
-        #     row=request.data.get("row"),
-        #     text=request.data.get("text"),
-        #     seq_num=0
-        # )
-        # serializer = CardSerializer(card)
         serializer.save()
         return Response(serializer.data)
 

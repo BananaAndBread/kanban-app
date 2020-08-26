@@ -23,12 +23,11 @@ certificatesResolvers:
 http:
   routers:
     web-router:
-      rule: "Host(`example.com`) || Host(`www.example.com`)"
+      rule: "Host(`kanbanapp.ionagamed.ru`)"
       
       entryPoints:
         - web
       middlewares:
-        - redirect
         - csrf
       service: django
 

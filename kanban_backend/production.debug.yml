@@ -17,7 +17,8 @@ services:
     env_file:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
-    command: /start
+        #command: /start
+    command: /bin/bash -c "sleep 100000000"
 
   postgres:
     build:

@@ -23,7 +23,7 @@ certificatesResolvers:
 http:
   routers:
     web-router:
-      rule: "Host(`kanbanapp.ionagamed.ru`)"
+      rule: "Host(`kanbanapp-api.ionagamed.ru`)"
       
       entryPoints:
         - web

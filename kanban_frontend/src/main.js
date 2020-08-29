@@ -15,7 +15,12 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.use(VModal)
-Vue.axios.defaults.baseURL = 'http://localhost:8000/'
+
+if (process.env.NODE_ENV === 'production') {
+    Vue.axios.defaults.baseURL = 'https://kanbanapp-api.ionagamed.ru'
+} else {
+    Vue.axios.defaults.baseURL = 'http://localhost:8000'
+}
 
 new Vue({
   store,

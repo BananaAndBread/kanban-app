@@ -3,7 +3,9 @@ FROM node:12.2.0-alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json /app/package.json
-RUN npm install --silent
+# node is very memory hungry for some reason during the install
+# thus limiting to 1G
+RUN npm install --max-old-space-size=1024
 RUN npm install @vue/cli@3.7.0 -g
 COPY . /app
 RUN npm run build
